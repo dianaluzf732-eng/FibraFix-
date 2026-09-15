@@ -4005,8 +4005,6 @@ showPurchaseNotification();
 
         // Pixel Purchase
         if (typeof fbq !== 'undefined') {
-          const phoneValue = '57' + phone.replace(/\D/g, '');
-          fbq('init', '2100749157204576', { ph: phoneValue });
           fbq('trackCustom', 'PedidoCOD', {
             value: window.offersData?.[selectedOffer]?.price || 0,
             currency: 'COP',
