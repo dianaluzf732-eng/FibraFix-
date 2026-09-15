@@ -1418,7 +1418,7 @@
             <p>
               <strong>No se trata de solo fibra,</strong>
               <span
-                >debes regenerar tu flora intestinal con probióticos y
+                >debes regenerar tu flora intestinal con pro y
                 prebioticos.</span
               >
             </p>
@@ -4014,6 +4014,19 @@ showPurchaseNotification();
             content_type: 'product',
             num_items: 1
           }, { eventID: ID_PEDIDO });
+        }
+
+        // ✅ Mostrar confirmación de pedido
+        if (typeof showOrderConfirmation === 'function') {
+          showOrderConfirmation({
+            oferta: selectedOffer,
+            nombre: name,
+            whatsapp: phone,
+            departamento: department,
+            ciudad: city,
+            direccion: address,
+            total: window.offersData?.[selectedOffer]?.price || 0
+          });
         }
 
         _formSubmitting = false;
