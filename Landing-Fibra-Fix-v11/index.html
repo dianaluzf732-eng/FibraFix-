@@ -3319,7 +3319,7 @@ const checkoutSubmit =
 document.getElementById("checkoutSubmit");
 const checkoutWarning =
 document.getElementById("checkoutWarning");
-const offersData = {
+const offersData = window.offersData = {
 iniciacion: {
 name: "INICIACIÓN",
 price: 79000,
@@ -3363,14 +3363,15 @@ items: [
 }
 };
 let currentOffer = null;
+window.currentOffer = null;
 function selectCheckoutOffer(offerKey) {
 const offer =
 offersData[offerKey];
 if (!offer) {
 return;
 }
-currentOffer =
-offerKey;
+currentOffer = offerKey;
+window.currentOffer = offerKey;
 selectedOfferInput.value =
 offer.name;
 selectedPriceInput.value =
@@ -3871,6 +3872,7 @@ showPurchaseNotification();
   <!-- ✅ Google Sheets + Popups dinámicos -->
   <script>
     const SHEETS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxJ87He_84WfhRV-Xnvi4Fw5F_0Y4m3fqE7DhHZOQ5UZL5dKsGq7Awe67Fcj_4dS_W_wA/exec';
+    const TIENDA = 'Tienda 1'; // ← Cambia esto en cada dominio
     var _formSubmitting = false;
 
     // ✅ Cargar nombres y ciudades dinámicos desde Apps Script
@@ -3977,11 +3979,11 @@ showPurchaseNotification();
         const fbp = document.cookie.match(/_fbp=([^;]+)/)?.[1] || '';
         const fbc = document.cookie.match(/_fbc=([^;]+)/)?.[1] || '';
 
-        const selectedOffer = window.currentOffer || '';
+        const selectedOffer = window.currentOffer || currentOffer || '';
         const offersMap = {
           'iniciacion': '1 Tarro - $79.000',
           'avanzado': '2 Tarros - $112.900',
-          'tratamiento-completo': '3 Tarros - $143.900'
+          'completo': '3 Tarros - $143.900'
         };
         const packName = offersMap[selectedOffer] || selectedOffer;
 
@@ -3998,7 +4000,8 @@ showPurchaseNotification();
               package: packName,
               id_evento: ID_PEDIDO,
               fbp, fbc,
-              estado: 'Pendiente'
+              estado: 'Divine',
+              tienda: TIENDA
             })
           });
         } catch(err) { console.error('Sheets error:', err); }
