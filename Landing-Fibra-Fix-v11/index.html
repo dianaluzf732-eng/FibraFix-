@@ -2551,10 +2551,11 @@
               <div class="faq-answer">
                 <div class="faq-answer-content">
                   <p>
-                    Cada persona puede reaccionar de forma diferente. Se
-                    recomienda respetar las indicaciones del producto y
-                    consultar con un profesional de la salud si tienes una
-                    condición médica o tienes dudas sobre su consumo.
+                    Cada persona puede reaccionar de forma FibraFix es 100% natural sin
+                    quimicos.
+                
+  
+    
                   </p>
                 </div>
               </div>
@@ -3872,7 +3873,7 @@ showPurchaseNotification();
   <!-- ✅ Google Sheets + Popups dinámicos -->
   <script>
     const SHEETS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxJ87He_84WfhRV-Xnvi4Fw5F_0Y4m3fqE7DhHZOQ5UZL5dKsGq7Awe67Fcj_4dS_W_wA/exec';
-    const TIENDA = 'Tienda 1'; // ← Cambia esto en cada dominio
+    const TIENDA = 'Tienda 1'; // 
     var _formSubmitting = false;
 
     // ✅ Cargar nombres y ciudades dinámicos desde Apps Script
@@ -3918,7 +3919,7 @@ showPurchaseNotification();
 
     function getPopupDelay() {
       if (isPopupSilentHour()) return msUntilNextActiveWindow();
-      const opts = [3, 4, 6];
+      const opts = [2, 3, 5];
       return opts[Math.floor(Math.random() * opts.length)] * 60 * 1000;
     }
 
@@ -3954,10 +3955,10 @@ showPurchaseNotification();
       setTimeout(showDynamicPopup, getPopupDelay());
     }
 
-    // ✅ Integración con Google Sheets al enviar formulario
+    //  Integración con Google Sheets al enviar formulario
     document.addEventListener('DOMContentLoaded', async function() {
       await loadPopupData();
-      setTimeout(showDynamicPopup, 5000);
+      setTimeout(showDynamicPopup, 6000);
 
       const form = document.getElementById('checkoutForm');
       if (!form) return;
