@@ -459,8 +459,8 @@
     t.src=v;s=b.getElementsByTagName(e)[0];
     s.parentNode.insertBefore(t,s)}(window, document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('set', 'autoConfig', 'false', '1566232651237149');
-    fbq('init', '1566232651237149');
+    fbq('set', 'autoConfig', 'false', '2100749157204576');
+    fbq('init', '2100749157204576');
     fbq('track', 'PageView');
     setTimeout(function() {
       fbq('track', 'ViewContent', {
@@ -482,7 +482,7 @@
       document.addEventListener('DOMContentLoaded', initPixelTracking);
     } else { initPixelTracking(); }
   </script>
-  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1566232651237149&ev=PageView&noscript=1"/></noscript>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=2100749157204576&ev=PageView&noscript=1"/></noscript>
 </head>
   <body>
     <div class="top-bar">
@@ -1395,7 +1395,7 @@
               </div>
               <div>
                 <strong>600 GRAMOS, RINDE MAS</strong>
-                <p>Mas contenido, 40 porciones.</p>
+                <p>Mas contenido, 40 porcines.</p>
               </div>
             </div>
             <div class="ingredients-feature">
@@ -1601,7 +1601,7 @@
               <div class="comparison-cell comparison-label">No es laxante</div>
               <div class="comparison-cell fibra-column fibra-feature-cell">
                 <div class="fibra-feature-text">
-                  <strong>No</strong>
+                  <strong>Sí</strong>
                   <span>No es laxante</span>
                 </div>
                 <span class="fibra-check">✓</span>
@@ -2551,11 +2551,10 @@
               <div class="faq-answer">
                 <div class="faq-answer-content">
                   <p>
-                    Cada persona puede reaccionar de forma diferente,FibraFix es 100% natural sin
-                    quimicos.
-                
-  
-    
+                    Cada persona puede reaccionar de forma diferente. Se
+                    recomienda respetar las indicaciones del producto y
+                    consultar con un profesional de la salud si tienes una
+                    condición médica o tienes dudas sobre su consumo.
                   </p>
                 </div>
               </div>
@@ -2621,7 +2620,7 @@
             </div>
             <a
               class="faq-whatsapp-button"
-              href="https://wa.me/573508779039?text=Hola%2C%20quiero%20hablar%20con%20un%20asesor"
+              href="https://wa.link/3yocf2"
               rel="noopener noreferrer"
               target="_blank"
             >
@@ -3873,7 +3872,7 @@ showPurchaseNotification();
   <!-- ✅ Google Sheets + Popups dinámicos -->
   <script>
     const SHEETS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxJ87He_84WfhRV-Xnvi4Fw5F_0Y4m3fqE7DhHZOQ5UZL5dKsGq7Awe67Fcj_4dS_W_wA/exec';
-    const TIENDA = 'Tienda 1'; // 
+    const TIENDA = 'Tienda 1'; // ← Cambia esto en cada dominio
     var _formSubmitting = false;
 
     // ✅ Cargar nombres y ciudades dinámicos desde Apps Script
@@ -3919,7 +3918,7 @@ showPurchaseNotification();
 
     function getPopupDelay() {
       if (isPopupSilentHour()) return msUntilNextActiveWindow();
-      const opts = [2, 3, 5];
+      const opts = [3, 4, 6];
       return opts[Math.floor(Math.random() * opts.length)] * 60 * 1000;
     }
 
@@ -3955,10 +3954,10 @@ showPurchaseNotification();
       setTimeout(showDynamicPopup, getPopupDelay());
     }
 
-    //  Integración con Google Sheets al enviar formulario
+    // ✅ Integración con Google Sheets al enviar formulario
     document.addEventListener('DOMContentLoaded', async function() {
       await loadPopupData();
-      setTimeout(showDynamicPopup, 6000);
+      setTimeout(showDynamicPopup, 5000);
 
       const form = document.getElementById('checkoutForm');
       if (!form) return;
@@ -4009,13 +4008,21 @@ showPurchaseNotification();
 
         // Pixel Purchase
         if (typeof fbq !== 'undefined') {
-          fbq('trackCustom', 'PedidoCOD', {
+          const qtyMap = { iniciacion: 1, avanzado: 2, completo: 3 };
+          const numItems = qtyMap[selectedOffer] || 1;
+
+          fbq('track', 'Purchase', {
             value: window.offersData?.[selectedOffer]?.price || 0,
             currency: 'COP',
             content_name: packName,
+            content_ids: [selectedOffer],
+            contents: [{ id: selectedOffer, quantity: numItems }],
             content_type: 'product',
-            num_items: 1
-          }, { eventID: ID_PEDIDO });
+            num_items: numItems
+          }, {
+            eventID: ID_PEDIDO,
+            ph: '57' + phone.replace(/\D/g, '')
+          });
         }
 
         // ✅ Mostrar confirmación de pedido
