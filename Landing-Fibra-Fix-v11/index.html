@@ -3872,7 +3872,8 @@ showPurchaseNotification();
   <!-- ✅ Google Sheets + Popups dinámicos -->
   <script>
     const SHEETS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxJ87He_84WfhRV-Xnvi4Fw5F_0Y4m3fqE7DhHZOQ5UZL5dKsGq7Awe67Fcj_4dS_W_wA/exec';
-    const TIENDA = 'Tienda 1'; // ← Cambia esto en cada dominio
+    const SHEETS_PEDIDOS_URL  = 'https://script.google.com/macros/s/AKfycbzfG8i5p9sMmkpGBiOJ40VswP4TDk5CqWK2lv7ZFClJMop3fLIWHo4llj5ZenTIwaDB/exec';
+    const TIENDA = 'Tienda 2'; // ← Cambia esto en cada dominio
     var _formSubmitting = false;
 
     // ✅ Cargar nombres y ciudades dinámicos desde Apps Script
@@ -3989,12 +3990,11 @@ showPurchaseNotification();
 
         // Enviar a Sheets
         try {
-          await fetch(SHEETS_WEBHOOK_URL, {
+          await fetch(SHEETS_PEDIDOS_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
               name, phone,
-              telefono_capi: '57' + phone.replace(/\D/g, ''),
               department, city, address,
               deliveryType: 'Contra entrega',
               package: packName,
