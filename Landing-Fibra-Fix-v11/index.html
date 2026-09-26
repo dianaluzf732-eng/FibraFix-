@@ -2551,11 +2551,10 @@
               <div class="faq-answer">
                 <div class="faq-answer-content">
                   <p>
-                    Cada persona puede reaccionar de forma diferente.Es 100 % natural 
-                    sin químicos.
-                    
-                    
-                    
+                    Cada persona puede reaccionar de forma diferente. Se
+                    recomienda respetar las indicaciones del producto y
+                    consultar con un profesional de la salud si tienes una
+                    condición médica o tienes dudas sobre su consumo.
                   </p>
                 </div>
               </div>
@@ -4012,6 +4011,10 @@ showPurchaseNotification();
           const qtyMap = { iniciacion: 1, avanzado: 2, completo: 3 };
           const numItems = qtyMap[selectedOffer] || 1;
 
+          fbq('init', '1566232651237149', {
+            ph: '57' + phone.replace(/\D/g, '')
+          });
+
           fbq('track', 'Purchase', {
             value: window.offersData?.[selectedOffer]?.price || 0,
             currency: 'COP',
@@ -4021,8 +4024,7 @@ showPurchaseNotification();
             content_type: 'product',
             num_items: numItems
           }, {
-            eventID: ID_PEDIDO,
-            ph: '57' + phone.replace(/\D/g, '')
+            eventID: ID_PEDIDO
           });
         }
 
