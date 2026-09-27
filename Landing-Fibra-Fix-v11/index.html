@@ -136,7 +136,7 @@
         max-width: 650px;
         margin-bottom: 24px;
         color: #064925;
-        font-size: clamp(48px, 5.4vw, 78px);
+        font-size: clamp(38px, 4vw, 55px);
         font-weight: 800;
         line-height: 0.98;
         letter-spacing: -4px;
@@ -335,7 +335,7 @@
           font-size: 11px;
         }
         .hero h1 {
-          font-size: clamp(42px, 12vw, 58px);
+          font-size: clamp(32px, 9vw, 46px);
           letter-spacing: -2.5px;
           margin-bottom: 20px;
         }
@@ -391,7 +391,7 @@
           padding-right: 14px;
         }
         .hero h1 {
-          font-size: 40px;
+          font-size: 30px;
         }
         .hero-description {
           font-size: 15px;
@@ -459,7 +459,6 @@
     t.src=v;s=b.getElementsByTagName(e)[0];
     s.parentNode.insertBefore(t,s)}(window, document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('set', 'autoConfig', 'false', '1566232651237149');
     fbq('init', '1566232651237149');
     fbq('track', 'PageView');
     setTimeout(function() {
@@ -528,15 +527,10 @@
             <div class="hero-badge">RESULTADOS EN SOLO 7 DIAS</div>
             <h1>
               ¿Hinchazón, pesadez y
-              <span> dificultad para ir al baño? </span>
+              <span>malestares digestivos?</span>
             </h1>
             <p class="hero-description">
-              <strong>Fibra Fix</strong> Su fórmula de <strong>600 g</strong>,
-              con
-              <strong>más de 15 ingredientes + prebióticos y probióticos</strong
-              >, desinflama, alivia , regenera y acompaña tu bienestar
-              digestivo.
-              <strong>Actua desde la primera semana.</strong>
+              Lo que comes <em style="font-style:normal;color:#064925;font-weight:700;">no se está absorbiendo bien</em> — y tu cuerpo lo siente todo: te inflamas, engordas sin razón aparente, te cansas al mínimo esfuerzo, tu memoria falla, te duelen las articulaciones, aparecen alergias, indigestión, estreñimiento, colon irritable… y hasta tu visión se ve afectada. Un colon sobrecargado es un almacén de toxinas que enferma en silencio y trae problemas serios y graves. <strong style="color:#ff6500;">Fibra Fix®</strong> limpia, repara y reactiva tu digestión — <em style="font-style:normal;font-weight:700;color:#064925;">¡desde la primera semana!</em>
             </p>
             <div class="benefit-row" id="beneficios">
               <div class="mini-benefit">
@@ -1601,8 +1595,7 @@
               <div class="comparison-cell comparison-label">No es laxante</div>
               <div class="comparison-cell fibra-column fibra-feature-cell">
                 <div class="fibra-feature-text">
-                  <strong>Sí</strong>
-                  <span>No es laxante</span>
+                  <span>No, no es laxante</span>
                 </div>
                 <span class="fibra-check">✓</span>
               </div>
@@ -2551,10 +2544,7 @@
               <div class="faq-answer">
                 <div class="faq-answer-content">
                   <p>
-                    Cada persona puede reaccionar de forma diferente. Se
-                    recomienda respetar las indicaciones del producto y
-                    consultar con un profesional de la salud si tienes una
-                    condición médica o tienes dudas sobre su consumo.
+                    Es 100% natural, sin químicos. Su fórmula está elaborada con ingredientes de origen vegetal que trabajan en armonía con tu cuerpo.
                   </p>
                 </div>
               </div>
@@ -3919,7 +3909,7 @@ showPurchaseNotification();
 
     function getPopupDelay() {
       if (isPopupSilentHour()) return msUntilNextActiveWindow();
-      const opts = [3, 4, 6];
+      const opts = [1, 2, 4];
       return opts[Math.floor(Math.random() * opts.length)] * 60 * 1000;
     }
 
