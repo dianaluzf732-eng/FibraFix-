@@ -3998,23 +3998,28 @@ showPurchaseNotification();
         } catch(err) { console.error('Sheets error:', err); }
 
         // Pixel Purchase
-        if (typeof fbq !== 'undefined') {
-          const qtyMap = { iniciacion: 1, avanzado: 2, completo: 3 };
-          const numItems = qtyMap[selectedOffer] || 1;
+if (typeof fbq !== 'undefined') {
+  const qtyMap = { iniciacion: 1, avanzado: 2, completo: 3 };
+  const numItems = qtyMap[selectedOffer] || 1;
 
-          fbq('track', 'Purchase', {
-            value: window.offersData?.[selectedOffer]?.price || 0,
-            currency: 'COP',
-            content_name: packName,
-            content_ids: [selectedOffer],
-            contents: [{ id: selectedOffer, quantity: numItems }],
-            content_type: 'product',
-            num_items: numItems
-          }, {
-            eventID: ID_PEDIDO,
-            ph: '57' + phone.replace(/\D/g, '')
-          });
-        }
+  // Actualizar datos del usuario antes del evento
+  fbq('init', '1566232651237149', { 
+    ph: '57' + phone.replace(/\D/g, '') 
+  });
+
+  // Disparar el pixel de compra
+  fbq('track', 'Purchase', {
+    value: window.offersData?.[selectedOffer]?.price || 0,
+    currency: 'COP',
+    content_name: packName,
+    content_ids: [selectedOffer],
+    contents: [{ id: selectedOffer, quantity: numItems }],
+    content_type: 'product',
+    num_items: numItems
+  }, {
+    eventID: ID_PEDIDO
+  });
+}
 
         // ✅ Mostrar confirmación de pedido
         if (typeof showOrderConfirmation === 'function') {
