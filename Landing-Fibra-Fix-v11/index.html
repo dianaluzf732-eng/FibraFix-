@@ -459,7 +459,7 @@
     t.src=v;s=b.getElementsByTagName(e)[0];
     s.parentNode.insertBefore(t,s)}(window, document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('set', 'autoConfig', 'false', '1566232651237149');
+    fbq('set', 'autoConfig', false, '1566232651237149');
     fbq('init', '1566232651237149');
     fbq('track', 'PageView');
     setTimeout(function() {
@@ -4001,10 +4001,6 @@ showPurchaseNotification();
         if (typeof fbq !== 'undefined') {
           const qtyMap = { iniciacion: 1, avanzado: 2, completo: 3 };
           const numItems = qtyMap[selectedOffer] || 1;
-
-          fbq('init', '1566232651237149', {
-            ph: '57' + phone.replace(/\D/g, '')
-          });
 
           fbq('track', 'Purchase', {
             value: window.offersData?.[selectedOffer]?.price || 0,
