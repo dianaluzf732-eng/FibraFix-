@@ -4011,7 +4011,8 @@ showPurchaseNotification();
             content_type: 'product',
             num_items: numItems
           }, {
-            eventID: ID_PEDIDO
+            eventID: ID_PEDIDO,
+            ph: '57' + phone.replace(/\D/g, '')
           });
         }
 
