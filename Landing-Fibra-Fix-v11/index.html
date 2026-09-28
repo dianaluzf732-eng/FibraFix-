@@ -3984,9 +3984,10 @@ showPurchaseNotification();
           await fetch(SHEETS_PEDIDOS_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({
-              name, phone,
-              department, city, address,
+           body: JSON.stringify({
+  name,
+  phone: '57' + phone.replace(/\D/g, ''),
+  department, city, address,
               deliveryType: 'Contra entrega',
               package: packName,
               id_evento: ID_PEDIDO,
