@@ -976,6 +976,78 @@ const checkoutSubmit = document.getElementById("checkoutSubmit");
 
 const checkoutWarning = document.getElementById("checkoutWarning");
 
+// ✅ Google Sheets (mismo script de pedidos que usaba el archivo con pixel)
+const SHEETS_PEDIDOS_URL =
+  "https://script.google.com/macros/s/AKfycbzfG8i5p9sMmkpGBiOJ40VswP4TDk5CqWK2lv7ZFClJMop3fLIWHo4llj5ZenTIwaDB/exec";
+const TIENDA = "Tienda 2"; // ← Cambia esto en cada dominio
+let _formSubmitting = false;
+
+// ✅ Envío confiable a Google Sheets: reintentos + cola guardada en el navegador
+const PENDING_KEY = "pedidosPendientesSheets";
+
+function getPendingOrders() {
+  try {
+    return JSON.parse(localStorage.getItem(PENDING_KEY) || "[]");
+  } catch (e) {
+    return [];
+  }
+}
+
+function setPendingOrders(list) {
+  try {
+    localStorage.setItem(PENDING_KEY, JSON.stringify(list));
+  } catch (e) {}
+}
+
+async function postToSheets(payload) {
+  // no-cors: solo falla si de verdad no hay conexión; Google igual recibe el pedido
+  await fetch(SHEETS_PEDIDOS_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload),
+  });
+}
+
+async function sendOrderToSheets(payload) {
+  // 1) Guardar primero, para que no se pierda si cierran la página
+  setPendingOrders([...getPendingOrders(), payload]);
+
+  // 2) Intentar enviar hasta 3 veces
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      await postToSheets(payload);
+      setPendingOrders(
+        getPendingOrders().filter((p) => p.id_evento !== payload.id_evento),
+      );
+      return true;
+    } catch (err) {
+      console.error("Sheets intento " + attempt + " falló:", err);
+      if (attempt < 3) {
+        await new Promise((r) => setTimeout(r, attempt * 1500));
+      }
+    }
+  }
+  return false; // queda en la cola y se reintenta después
+}
+
+async function flushPendingOrders() {
+  const pending = getPendingOrders();
+  for (const payload of pending) {
+    try {
+      await postToSheets(payload);
+      setPendingOrders(
+        getPendingOrders().filter((p) => p.id_evento !== payload.id_evento),
+      );
+    } catch (err) {
+      return; // sigue sin conexión, se intenta más tarde
+    }
+  }
+}
+
+window.addEventListener("online", flushPendingOrders);
+window.addEventListener("load", () => setTimeout(flushPendingOrders, 3000));
+
 const offersData = {
 
   iniciacion: {
@@ -1320,55 +1392,59 @@ if (checkoutForm) {
 
     };
 
-   try {
+    if (_formSubmitting) return;
+    _formSubmitting = true;
 
-  const response = await fetch("/api/orders", {
+    const ID_PEDIDO = "cod_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+    const fbp = document.cookie.match(/_fbp=([^;]+)/)?.[1] || "";
+    const fbc = document.cookie.match(/_fbc=([^;]+)/)?.[1] || "";
+    const qtyMap = { iniciacion: 1, avanzado: 2, completo: 3 };
+    const numItems = qtyMap[orderData.oferta] || 1;
+    const packName =
+      numItems +
+      (numItems === 1 ? " Tarro" : " Tarros") +
+      " - " +
+      offersData[orderData.oferta].formattedPrice;
 
-    method: "POST",
+    // Enviar pedido a Google Sheets (con reintentos y cola de respaldo)
+    await sendOrderToSheets({
+      name: orderData.nombre,
+      phone: orderData.whatsapp,
+      department: orderData.departamento,
+      city: orderData.ciudad,
+      address: orderData.direccion,
+      deliveryType: "Contra entrega",
+      package: packName,
+      id_evento: ID_PEDIDO,
+      fbp,
+      fbc,
+      estado: "Divine",
+      tienda: TIENDA,
+    });
 
-    headers: {
+    // ✅ Meta Pixel - Purchase
+    if (typeof fbq !== "undefined") {
+      fbq(
+        "track",
+        "Purchase",
+        {
+          value: orderData.total,
+          currency: "COP",
+          content_name: packName,
+          content_ids: [orderData.oferta],
+          contents: [{ id: orderData.oferta, quantity: numItems }],
+          content_type: "product",
+          num_items: numItems,
+        },
+        {
+          eventID: ID_PEDIDO,
+          ph: "57" + orderData.whatsapp.replace(/\D/g, ""),
+        },
+      );
+    }
 
-      "Content-Type": "application/json",
-
-    },
-
-    body: JSON.stringify(orderData),
-
-  });
-
-
-
-  const result = await response.json();
-
-
-
-  if (!response.ok) {
-
-    throw new Error(result.message || "No se pudo registrar el pedido");
-
-  }
-
-
-
-  console.log("Pedido enviado al backend:", result);
-
-
-
-  showOrderConfirmation(orderData);
-
-} catch (error) {
-
-  console.error("Error enviando el pedido:", error);
-
-
-
-  alert(
-
-    "No pudimos registrar tu pedido. Por favor intenta nuevamente."
-
-  );
-
-}
+    showOrderConfirmation(orderData);
+    _formSubmitting = false;
 
   });
 
@@ -1686,142 +1762,114 @@ const demoPurchases = [
 
 ];
 
-let currentPurchaseIndex = 0;
+// ✅ Popups de compras dinámicos: nombres y ciudades desde Google Sheets
+const SHEETS_WEBHOOK_URL =
+  "https://script.google.com/macros/s/AKfycbxJ87He_84WfhRV-Xnvi4Fw5F_0Y4m3fqE7DhHZOQ5UZL5dKsGq7Awe67Fcj_4dS_W_wA/exec";
 
+let firstNamesList = [];
+let citiesList = [];
 let purchaseShowTimer = null;
-
 let purchaseHideTimer = null;
-
-let purchaseNextTimer = null;
-
 let purchaseNotificationsStopped = false;
 
-function getPurchaseText(quantity) {
-
-  if (quantity === 1) {
-
-    return "compró 1 tarro de Fibra Fix";
-
-  }
-
-  return `compró ${quantity} tarros de Fibra Fix`;
-
+async function loadPopupData() {
+  try {
+    const res = await fetch(SHEETS_WEBHOOK_URL, { method: "GET" });
+    const data = await res.json();
+    firstNamesList = data.names || [];
+    citiesList = data.cities || [];
+  } catch (e) {
+    firstNamesList = ["Camila", "Santiago", "Valentina", "Mateo", "Lucía", "Alejandro", "Daniela", "Sebastián", "Mariana", "Felipe"];
+    citiesList = ["Bogotá", "Medellín", "Cali", "Barranquilla", "Bucaramanga", "Cartagena", "Cúcuta", "Pereira", "Manizales", "Ibagué"];
+  }
 }
 
-function updatePurchaseNotification(purchase) {
+function getRandomItem(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
 
-  if (!purchaseNotification || !purchase) {
+function getBogotaHour() {
+  return parseInt(
+    new Intl.DateTimeFormat("en-US", { timeZone: "America/Bogota", hour: "numeric", hour12: false }).format(new Date()),
+    10,
+  );
+}
 
-    return;
+function isPopupSilentHour() {
+  const hour = getBogotaHour();
+  return hour >= 22 || hour < 7;
+}
 
-  }
+function msUntilNextActiveWindow() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Bogota", hour: "numeric", minute: "numeric", second: "numeric", hour12: false,
+  }).formatToParts(new Date());
+  const get = (type) => parseInt(parts.find((p) => p.type === type).value, 10);
+  const hour = get("hour"), min = get("minute"), sec = get("second");
+  const hoursUntil7am = hour >= 22 ? 24 - hour + 7 : 7 - hour;
+  return Math.max((hoursUntil7am * 3600 - min * 60 - sec) * 1000, 60000);
+}
 
-  purchaseNotificationName.textContent = purchase.name;
+function getPopupDelay() {
+  if (isPopupSilentHour()) return msUntilNextActiveWindow();
+  const opts = [1, 2, 4];
+  return opts[Math.floor(Math.random() * opts.length)] * 60 * 1000;
+}
 
-  purchaseNotificationCity.textContent = `de ${purchase.city}`;
+function getRandomMinutes() {
+  return Math.floor(Math.random() * 14) + 2;
+}
 
-  purchaseNotificationOrder.textContent = getPurchaseText(purchase.quantity);
-
-  purchaseNotificationTime.textContent = purchase.time;
-
-  purchaseNotificationStatus.textContent = "Vista previa";
-
+function getPurchaseText(quantity) {
+  if (quantity === 1) {
+    return "compró 1 tarro de Fibra Fix";
+  }
+  return `compró ${quantity} tarros de Fibra Fix`;
 }
 
 function showPurchaseNotification() {
+  if (purchaseNotificationsStopped || !purchaseNotification) {
+    return;
+  }
+  if (isPopupSilentHour() || !firstNamesList.length || !citiesList.length) {
+    purchaseShowTimer = setTimeout(showPurchaseNotification, getPopupDelay());
+    return;
+  }
 
-  if (
+  const qty = Math.random() > 0.5 ? (Math.random() > 0.5 ? 3 : 2) : 1;
+  purchaseNotificationName.textContent = getRandomItem(firstNamesList);
+  purchaseNotificationCity.textContent = "de " + getRandomItem(citiesList);
+  purchaseNotificationOrder.textContent = getPurchaseText(qty);
+  purchaseNotificationTime.textContent = "Hace " + getRandomMinutes() + " minutos";
+  purchaseNotificationStatus.textContent = "Compra reciente";
 
-    purchaseNotificationsStopped ||
+  requestAnimationFrame(() => {
+    purchaseNotification.classList.add("is-visible");
+  });
 
-    !purchaseNotification ||
-
-    demoPurchases.length === 0
-
-  ) {
-
-    return;
-
-  }
-
-  const purchase = demoPurchases[currentPurchaseIndex];
-
-  updatePurchaseNotification(purchase);
-
-  requestAnimationFrame(() => {
-
-    purchaseNotification.classList.add("is-visible");
-
-  });
-
-  clearTimeout(purchaseHideTimer);
-
-  purchaseHideTimer = setTimeout(() => {
-
-    hidePurchaseNotification();
-
-  }, 5500);
-
+  clearTimeout(purchaseHideTimer);
+  purchaseHideTimer = setTimeout(hidePurchaseNotification, 6000);
+  purchaseShowTimer = setTimeout(showPurchaseNotification, getPopupDelay());
 }
 
 function hidePurchaseNotification() {
-
-  if (!purchaseNotification) {
-
-    return;
-
-  }
-
-  purchaseNotification.classList.remove("is-visible");
-
-  clearTimeout(purchaseNextTimer);
-
-  purchaseNextTimer = setTimeout(() => {
-
-    if (purchaseNotificationsStopped) {
-
-      return;
-
-    }
-
-    currentPurchaseIndex++;
-
-    if (currentPurchaseIndex >= demoPurchases.length) {
-
-      currentPurchaseIndex = 0;
-
-    }
-
-    showPurchaseNotification();
-
-  }, 15500);
-
+  if (!purchaseNotification) {
+    return;
+  }
+  purchaseNotification.classList.remove("is-visible");
 }
 
 if (purchaseNotificationClose) {
-
-  purchaseNotificationClose.addEventListener("click", () => {
-
-    purchaseNotificationsStopped = true;
-
-    clearTimeout(purchaseShowTimer);
-
-    clearTimeout(purchaseHideTimer);
-
-    clearTimeout(purchaseNextTimer);
-
-    purchaseNotification.classList.remove("is-visible");
-
-  });
-
+  purchaseNotificationClose.addEventListener("click", () => {
+    purchaseNotificationsStopped = true;
+    clearTimeout(purchaseShowTimer);
+    clearTimeout(purchaseHideTimer);
+    purchaseNotification.classList.remove("is-visible");
+  });
 }
 
-if (purchaseNotification && demoPurchases.length > 0) {
-
-  purchaseShowTimer = setTimeout(() => {
-
-    showPurchaseNotification();
-
-  }, 4500);
-
+if (purchaseNotification) {
+  loadPopupData().then(() => {
+    purchaseShowTimer = setTimeout(showPurchaseNotification, 5000);
+  });
 }
