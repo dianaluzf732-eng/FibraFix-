@@ -458,7 +458,8 @@
     if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
     n.queue=[];t=b.createElement(e);t.async=!0;
     t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    var go=function(){setTimeout(function(){s.parentNode.insertBefore(t,s)},1000)};
+    if(b.readyState==='complete'){go()}else{f.addEventListener('load',go)}}(window, document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
     fbq('set', 'autoConfig', false, '1566232651237149');
     fbq('init', '1566232651237149');
@@ -477,7 +478,7 @@
         if (scrollPercent >= 25 && !scroll25) { fbq('trackCustom', 'Lectura_25_Porciento'); scroll25 = true; }
         if (scrollPercent >= 50 && !scroll50) { fbq('trackCustom', 'Lectura_Mitad_Pagina'); scroll50 = true; }
         if (scrollPercent >= 75 && !scroll75) { fbq('trackCustom', 'Lectura_Profunda_75_Porciento'); scroll75 = true; }
-      });
+      }, { passive: true });
     }
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initPixelTracking);
@@ -2913,7 +2914,7 @@
           </div>
         </div>
       </div>
-      <script defer="" src="js/script.js?v=4"></script>
+      <script defer="" src="js/script.js?v=5"></script>
     </main>
   
   </body>
