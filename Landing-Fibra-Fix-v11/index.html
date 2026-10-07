@@ -460,7 +460,7 @@
     t.src=v;s=b.getElementsByTagName(e)[0];
     var done=!1,go=function(){if(done)return;done=!0;s.parentNode.insertBefore(t,s)};
     ['scroll','touchstart','mousemove','keydown','click'].forEach(function(ev){f.addEventListener(ev,go,{once:!0,passive:!0})});
-    setTimeout(go,8000)}(window, document,'script',
+    setTimeout(go,4000)}(window, document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
     fbq('set', 'autoConfig', false, '1566232651237149');
     fbq('init', '1566232651237149');
@@ -1465,12 +1465,12 @@
               <div class="how-use-gif-container">
                 <video
                   aria-label="Preparación de Fibra Fix"
-                  autoplay=""
                   class="how-use-gif"
+                  id="howUseVideo"
                   loop=""
                   muted=""
                   playsinline=""
-                  preload="metadata"
+                  preload="none"
                 >
                   <source
                     src="images/modo-uso/preparacion-fibra-fix.webm"
@@ -1734,7 +1734,7 @@
                     controls=""
                     id="testimonialVideo"
                     playsinline=""
-                    preload="metadata"
+                    preload="none"
                   >
                     <source
                       src="videos/video-testimonio-web.mp4"
@@ -2915,7 +2915,7 @@
           </div>
         </div>
       </div>
-      <script defer="" src="js/script.js?v=5"></script>
+      <script defer="" src="js/script.js?v=6"></script>
     </main>
   
   </body>
